@@ -1,0 +1,116 @@
+﻿@model ShopBridge.Models.Item
+@{
+    ViewBag.Title = "Update Item";
+}
+@using (Html.BeginForm("Edit", "Item", FormMethod.Post, new { @id = "form", enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    
+    <div class="form-horizontal">
+        <div class="row">
+            <div class="col-md-offset-2 col-md-8">
+                <div class="panel">
+                    <div class="panel-heading custom-header-panel">
+                        <h3 class="panel-title roboto">Update Item</h3>
+                    </div>
+                    <div class="panel-body">
+                        <h3 class="text-danger">@ViewBag.Msg</h3>
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        @Html.HiddenFor(model => model.Id)
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Name, new { @class = "control-label required col-md-4" })
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(model => model.Name, new { @Id = "Name", @class = "form-control", @onkeypress = "return validateInput(event);" })
+                                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Description, new { @class = "control-label required col-md-4" })
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(model => model.Description, new { @Id = "Description", @class = "form-control", @onkeypress = "return validateInput(event);" })
+                                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Price, new { @class = "control-label required col-md-4" })
+                            <div class="col-md-8">
+                                @Html.TextBoxFor(model => model.Price, "{0:#.#}", new { @type = "number", @class = "form-control" })
+                                @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.Image, new { @class = "control-label col-md-4" })
+                            @Html.HiddenFor(model => model.Image)
+                            <div class="col-md-8">
+                                <input type="file" name="file" id="file" class="form-control" style="width: 100%;" onchange="preview(this)" /> <br />
+                                @{
+                                    if (Model.Image != null)
+                                    {
+                                        string img_Src = string.Format("data:image/jpg;base64,{0}", Convert.ToBase64String(Model.Image));
+                                        <img src="@img_Src" id="imagePreview" height="180" />
+                                    }
+                                    else
+                                    {
+                                        <img src=" " id="imagePreview" height="180" />
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group text-center">
+                        <button id="submit" type="submit" onclick="return validateImage();" class="btn btn-orange-md roboto">Update</button>
+                        @Html.ActionLink("Back to List", "Index", null, new { @class = "btn btn-default-md roboto" })
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        //function validateImage() {
+        //    debugger
+        //    var file = form.file.value;
+        //    var reg = /(.*?)\.(jpg|bmp|jpeg|png)$/;
+        //    if (!file.match(reg)) {
+        //        toastr.warning('Please Select Item Photo!');
+        //        return false;
+        //    }
+        //    else {
+        //        form.submit();
+        //    }
+        //}
+        function validateInput(event) {
+            debugger
+            var regex = new RegExp("^[0-9a-zA-Z]+$");
+            var key = String.fromCharCode(event.charCode ? event.which : event.charCode);
+            if (!regex.test(key)) {
+                toastr.warning("Special Characters are Not Allowed !");
+                event.preventDefault();
+                return false;
+            }
+        }
+
+        function preview(input) {
+            if (input.files && input.files[0]) {
+                var ImageDir = new FileReader();
+                ImageDir.onload = function (e) {
+                    $('#imagePreview').attr('src', e.target.result);
+                }
+                ImageDir.readAsDataURL(input.files[0]);
+            }
+        }
+        $("#imagePreview").change(function () {
+            var val = $("#fileUpload").val();
+            toastr.warning("" + val);
+            if (!val.match(/(?:gif|jpg|png|bmp|jpeg)$/)) {
+                toastr.warning("Please Select Image File Only!");
+            }
+        });
+       
+    </script>
+    
+}
+
